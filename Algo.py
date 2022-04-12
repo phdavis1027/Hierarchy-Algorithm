@@ -2,17 +2,18 @@ import networkx as nx
 
 def max_euler_subgraph(G):
     g = G.copy()
-    for edge in g.edges(): # assign every edge a weight of -1
-        g[edge[0]][edge[1]]['weight'] = -1 
-    while True:
-        try: 
-            c = nx.find_cycle(g) # get some cycle
-            if is_neg_cycle(c, g):
+    for f, t in g.edges(): # assign every edge a weight of -1
+        g[f][t]['weight'] = -1 
+    done = False
+    while not done:
+        done = True
+        cycles = nx.simple_cycles(g)
+        for c in cycles:
+            if is_neg_cycle(c):
+                done = False
                 invert_edge_weights(c, g)
                 reverse_edge_directions(c, g)
-            else: break
-        except nx.NetworkXNoCycle:
-            break
+                break
     
     neg_edges = []
     pos_edges = []
@@ -67,8 +68,7 @@ def label_compare(u, v, g, weights):
 
 def is_neg_cycle(c, g):
     sum = 0
-    for e in c:
-        source, target = e
+    for source, target in c:
         sum += g.get_edge_data(source, target)['weight']
     return sum < 0
 

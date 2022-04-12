@@ -5,11 +5,14 @@ def max_euler_subgraph(G):
     for edge in g.edges(): # assign every edge a weight of -1
         g[edge[0]][edge[1]]['weight'] = -1 
     while True:
-        c = nx.find_cycle(g) # get some cycle
-        if is_neg_cycle(c, g):
-            invert_edge_weights(c, g)
-            reverse_edge_directions(c, g)
-        else: break
+        try: 
+            c = nx.find_cycle(g) # get some cycle
+            if is_neg_cycle(c, g):
+                invert_edge_weights(c, g)
+                reverse_edge_directions(c, g)
+            else: break
+        except nx.NetworkXNoCycle:
+            break
     
     neg_edges = []
     pos_edges = []
@@ -36,28 +39,30 @@ def max_euler_subgraph(G):
 
 def agony_label(g, DAG, H):
     output = {}
-    labels = {node : 1 for node in g.nodes()}
-    nx.set_node_attributes(g, labels, 'rank')
-    ranks = nx.get_node_attributes(g, 'rank')
+    ranks = {node : 0 for node in g.nodes()}
+    nx.set_node_attributes(g, ranks, 'rank') # set every node's rank to zero
     weights = nx.get_edge_attributes(g, 'weight')
     done = False
     while not done:
         for u, v in g.edges():
-            if label_compare(u, v, g, ranks, weights):
+            if label_compare(u, v, g, weights):
+                print(g.nodes[v]['rank'], " < ", g.nodes[u]['rank'], " - ", weights[u, v])
                 done = False
                 g.nodes[v]['rank'] = g.nodes[u]['rank'] - weights[u, v]
+                break
             else: done = True
-
+    print({n : g.nodes[n]['rank'] for n in g.nodes})
+    '''
     for u, v in DAG.edges():
         output[u,v] = 0
     for u, v in H.edges():
-        output[u,v] = ranks[u] - ranks[v] + 1
+        output[u,v] = g.nodes[u]['rank'] - g.nodes[v]['rank'] + 1
+    '''
     
     return output
 
-def label_compare(u, v, g, ranks, weights):
-    l_u, l_v = ranks[u], ranks[v]
-    return l_v < l_u - weights[u, v]
+def label_compare(u, v, g, weights):
+    return g.nodes[v]['rank'] < g.nodes[u]['rank'] - weights[u, v]
     
 
 def is_neg_cycle(c, g):

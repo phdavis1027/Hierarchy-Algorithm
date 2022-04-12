@@ -1,18 +1,29 @@
 import networkx as nx
 
+def hierarchy(G, r):
+    tot = 0
+    for i, j in G.edges():
+        tot += max([r[i] - r[j] + 1, 0])
+    m = len(G.edges)
+    return 1 - tot/m
+
 def max_euler_subgraph(G):
     g = G.copy()
-    for edge in g.edges(): # assign every edge a weight of -1
-        g[edge[0]][edge[1]]['weight'] = -1 
-    while True:
-        try: 
-            c = nx.find_cycle(g) # get some cycle
+    for f, t in g.edges(): # assign every edge a weight of -1
+        g[f][t]['weight'] = -1 
+    done = False
+    while not done:
+        done = True
+        cycles = nx.simple_cycles(g)
+        for cycle in cycles:
+            c = [(cycle[-1], cycle[0])]
+            for i in range(len(cycle) - 1):
+                c.append((cycle[i], cycle[i + 1]))
             if is_neg_cycle(c, g):
+                done = False
                 invert_edge_weights(c, g)
                 reverse_edge_directions(c, g)
-            else: break
-        except nx.NetworkXNoCycle:
-            break
+                break
     
     neg_edges = []
     pos_edges = []
@@ -32,13 +43,10 @@ def max_euler_subgraph(G):
         H[t][f]['weight'] = 1 # gotta re-weight the edges since they were lost 
                               # in translation
     edges = list(H.edges())
-    reverse_edge_directions(edges, H)
-
-
     return g, DAG, H
 
 def agony_label(g, DAG, H):
-    output = {}
+    agonies = {}
     ranks = {node : 0 for node in g.nodes()}
     nx.set_node_attributes(g, ranks, 'rank') # set every node's rank to zero
     weights = nx.get_edge_attributes(g, 'weight')
@@ -46,20 +54,18 @@ def agony_label(g, DAG, H):
     while not done:
         for u, v in g.edges():
             if label_compare(u, v, g, weights):
-                print(g.nodes[v]['rank'], " < ", g.nodes[u]['rank'], " - ", weights[u, v])
                 done = False
                 g.nodes[v]['rank'] = g.nodes[u]['rank'] - weights[u, v]
                 break
             else: done = True
-    print({n : g.nodes[n]['rank'] for n in g.nodes})
-    '''
+    ranks = {n : g.nodes[n]['rank'] for n in g.nodes}
+
     for u, v in DAG.edges():
-        output[u,v] = 0
+        agonies[u,v] = 0
     for u, v in H.edges():
-        output[u,v] = g.nodes[u]['rank'] - g.nodes[v]['rank'] + 1
-    '''
-    
-    return output
+        agonies[u,v] = g.nodes[u]['rank'] - g.nodes[v]['rank'] + 1
+
+    return ranks, agonies
 
 def label_compare(u, v, g, weights):
     return g.nodes[v]['rank'] < g.nodes[u]['rank'] - weights[u, v]
@@ -67,8 +73,7 @@ def label_compare(u, v, g, weights):
 
 def is_neg_cycle(c, g):
     sum = 0
-    for e in c:
-        source, target = e
+    for source, target in c:
         sum += g.get_edge_data(source, target)['weight']
     return sum < 0
 

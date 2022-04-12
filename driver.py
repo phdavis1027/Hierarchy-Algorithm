@@ -5,7 +5,7 @@ from Tests import (
 )
 
 def main():
-    # test_cycle()
+    test_cycle()
     test_chain()
 
 

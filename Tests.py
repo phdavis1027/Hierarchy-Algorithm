@@ -47,3 +47,18 @@ def test_fig_two_a():
     g, DAG, H = max_euler_subgraph(G)
     ranks, agonies = agony_label(g, DAG, H)
     print("Figure Two on the Right h(G) = ", hierarchy(G, ranks))
+
+def test_fig_two_b():
+    G = nx.DiGraph()
+    edges =[
+        (1, 2),
+        (3, 2),
+        (2, 6),
+        (4, 3),
+        (5, 3),
+        (6, 5)
+    ]
+    G.add_edges_from(edges)
+    g, DAG, H = max_euler_subgraph(G)
+    ranks, agonies = agony_label(g, DAG, H)
+    print("Figure Two on the Left h(G) = ", hierarchy(G, ranks))

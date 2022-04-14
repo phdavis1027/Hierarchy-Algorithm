@@ -16,7 +16,7 @@ def test_cycle():
                             # this algo
     g, DAG, H = max_euler_subgraph(G)
     ranks, agonies = agony_label(g, DAG, H)
-    print(hierarchy(G, ranks))
+    print("Cycle : ", hierarchy(G, ranks))
 
 def test_chain():
     G = nx.DiGraph()
@@ -30,4 +30,20 @@ def test_chain():
     G.add_edges_from(edges)  # this is the chain graph from that same page of the paper
     g, DAG, H = max_euler_subgraph(G)
     ranks, agonies = agony_label(g, DAG, H)
-    print(hierarchy(G, ranks))
+    print("Chain : ", hierarchy(G, ranks))
+
+def test_fig_two_a():
+    G = nx.DiGraph()
+    edges =[
+        (1, 2),
+        (2, 1),
+        (3, 2),
+        (4, 3),
+        (5, 3),
+        (6, 5)
+    ]
+
+    G.add_edges_from(edges)
+    g, DAG, H = max_euler_subgraph(G)
+    ranks, agonies = agony_label(g, DAG, H)
+    print("Figure Two on the Right h(G) = ", hierarchy(G, ranks))

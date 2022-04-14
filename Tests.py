@@ -62,3 +62,28 @@ def test_fig_two_b():
     g, DAG, H = max_euler_subgraph(G)
     ranks, agonies = agony_label(g, DAG, H)
     print("Figure Two on the Left h(G) = ", hierarchy(G, ranks))
+
+def test_collection_of_cycles():
+    G = nx.DiGraph()
+    edges = [
+        (1, 2),
+        (2, 3),
+        (3, 4),
+        (4, 5),
+        (5, 6),
+        (6, 7),
+        (7, 1),
+        (7, 8),
+        (8, 3),
+        (3, 9),
+        (9, 7),
+        (9, 4),
+        (4, 10),
+        (10, 6),
+        (6, 9)
+    ]
+
+    G.add_edges_from(edges)
+    g, DAG, H = max_euler_subgraph(G)
+    ranks, agonies = agony_label(g, DAG, H)
+    print("Collection of cycles h(G)=", hierarchy(G, ranks))

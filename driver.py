@@ -4,7 +4,8 @@ from Tests import (
     test_cycle,
     test_chain,
     test_fig_two_a,
-    test_fig_two_b
+    test_fig_two_b,
+    test_tree
 )
 
 def main():
@@ -13,6 +14,7 @@ def main():
     test_fig_two_a()
     test_fig_two_b()
     test_collection_of_cycles()
+    test_tree()
 
 
 if __name__ == '__main__':

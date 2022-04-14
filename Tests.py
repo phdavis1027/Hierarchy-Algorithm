@@ -87,3 +87,23 @@ def test_collection_of_cycles():
     g, DAG, H = max_euler_subgraph(G)
     ranks, agonies = agony_label(g, DAG, H)
     print("Collection of cycles h(G)=", hierarchy(G, ranks))
+
+def test_tree():
+    G = nx.DiGraph()
+    edges = [
+        (2, 1),
+        (3, 1),
+        (4, 1),
+        (5, 3),
+        (6, 3),
+        (7, 6),
+        (8, 6),
+        (9, 4),
+        (10, 4),
+        (11, 4),
+        (12, 4)
+    ]
+    G.add_edges_from(edges)
+    g, DAG, H = max_euler_subgraph(G)
+    ranks, agonies = agony_label(g, DAG, H)
+    print("Tree h(G)=", hierarchy(G, ranks))
